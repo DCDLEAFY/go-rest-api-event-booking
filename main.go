@@ -36,7 +36,7 @@ func saveEvent(context *gin.Context) {
 		context.JSON(http.StatusInternalServerError, gin.H{"message": "unable to create event. Try again later!"})
 		return
 	}
-	context.JSON(http.StatusCreated, gin.H{"message": "event created", "event": e})
+	context.JSON(http.StatusCreated, e)
 }
 
 func getAllEvents(context *gin.Context) {
