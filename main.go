@@ -18,13 +18,13 @@ func main() {
 	server.Run(":8080")
 }
 
-func saveEvent(context *gin.Context) {
+func saveEvent(ctx *gin.Context) {
 
 	var e models.Event
-	err := context.ShouldBindJSON(&e)
+	err := ctx.ShouldBindJSON(&e)
 
 	if err != nil {
-		context.JSON(http.StatusBadRequest, gin.H{"message": "Could not parse request"})
+		ctx.JSON(http.StatusBadRequest, gin.H{"message": "Could not parse request"})
 		return
 	}
 
@@ -33,17 +33,17 @@ func saveEvent(context *gin.Context) {
 	e.UserId = 1
 	sError := e.Save()
 	if sError != nil {
-		context.JSON(http.StatusInternalServerError, gin.H{"message": "unable to create event. Try again later!"})
+		ctx.JSON(http.StatusInternalServerError, gin.H{"message": "unable to create event. Try again later!"})
 		return
 	}
-	context.JSON(http.StatusCreated, e)
+	ctx.JSON(http.StatusCreated, e)
 }
 
-func getAllEvents(context *gin.Context) {
+func getAllEvents(ctx *gin.Context) {
 	e, getErr := models.GetAllEvents()
 	if getErr != nil {
-		context.JSON(http.StatusInternalServerError, gin.H{"message": "could not retrieve events. Try again later!"})
+		ctx.JSON(http.StatusInternalServerError, gin.H{"message": "could not retrieve events. Try again later!"})
 		return
 	}
-	context.JSON(http.StatusOK, e)
+	ctx.JSON(http.StatusOK, e)
 }
