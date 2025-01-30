@@ -1,9 +1,8 @@
 package models
 
 import (
-	"time"
-
 	"example.com/event-booking-api/db"
+	"time"
 )
 
 type Event struct {
@@ -81,4 +80,27 @@ func GetEventById(id int64) (*Event, error) {
 	}
 
 	return &event, nil
+}
+
+func (e *Event) Update() error {
+	query := `
+  UPDATE events
+  SET 
+  name = ?, 
+  description = ?,
+  location = ?,
+  datetime = ?
+  WHERE id = ?
+  `
+	stmt, err := db.Db.Prepare(query)
+
+	if err != nil {
+		return err
+	}
+
+	defer stmt.Close()
+
+	_, err = stmt.Exec(e.Name, e.Description, e.Location, e.Datetime, e.Id)
+
+	return err
 }
