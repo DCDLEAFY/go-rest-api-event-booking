@@ -63,7 +63,7 @@ func updateEvent(ctx *gin.Context) {
 		return
 	}
 
-	_, getErr := models.GetEventById(int64(idInt))
+	_, getErr := models.GetEventById(idInt)
 	if getErr != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"message": "Could not fetch event"})
 		return
@@ -86,4 +86,26 @@ func updateEvent(ctx *gin.Context) {
 	}
 
 	ctx.JSON(http.StatusOK, gin.H{"message": "updated succesfully"})
+}
+
+func deleteEvent(ctx *gin.Context) {
+	idStr := ctx.Param("id")
+	idInt, err := strconv.ParseInt(idStr, 10, 64)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"err": err.Error()})
+		return
+	}
+
+	event, err := models.GetEventById(idInt)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"err": event})
+		return
+	}
+
+	err = event.Delete()
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"err": err.Error()})
+		return
+	}
+	ctx.JSON(http.StatusOK, *event)
 }
