@@ -2,6 +2,7 @@ package main
 
 import (
 	"net/http"
+	"strconv"
 
 	"example.com/event-booking-api/db"
 	"example.com/event-booking-api/models"
@@ -14,6 +15,7 @@ func main() {
 
 	server.GET("/getallevents", getAllEvents)
 	server.POST("/createevent", saveEvent)
+	server.GET("/getevent/:id", getEventById)
 
 	server.Run(":8080")
 }
@@ -46,4 +48,21 @@ func getAllEvents(ctx *gin.Context) {
 		return
 	}
 	ctx.JSON(http.StatusOK, e)
+}
+
+func getEventById(ctx *gin.Context) {
+	idStr := ctx.Param("id")
+	idInt, convErr := strconv.ParseInt(idStr, 10, 64)
+	if convErr != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"message": "Could not parse event id"})
+		return
+	}
+
+	e, getErr := models.GetEventById(int64(idInt))
+	if getErr != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"message": "could not fetch event"})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, *e)
 }

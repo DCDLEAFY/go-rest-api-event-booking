@@ -27,13 +27,13 @@ func (e *Event) Save() error {
     userId
   ) VALUES (?, ?, ?, ?, ?)
   `
-	dbQuery, stErr := db.Db.Prepare(query)
-	if stErr != nil {
-		return stErr
+	stmt, qErr := db.Db.Prepare(query)
+	if qErr != nil {
+		return qErr
 	}
-	defer dbQuery.Close()
+	defer stmt.Close()
 
-	res, exErr := dbQuery.Exec(e.Name, e.Description, e.Location, e.Datetime, e.UserId)
+	res, exErr := stmt.Exec(e.Name, e.Description, e.Location, e.Datetime, e.UserId)
 	if exErr != nil {
 		return exErr
 	}
@@ -68,4 +68,17 @@ func GetAllEvents() ([]Event, error) {
 	}
 
 	return events, nil
+}
+
+func GetEventById(id int64) (*Event, error) {
+	query := "SELECT * FROM events WHERE Id = ?"
+	qRow := db.Db.QueryRow(query, id)
+
+	var event Event
+	sErr := qRow.Scan(&event.Id, &event.Name, &event.Description, &event.Location, &event.Datetime, &event.UserId)
+	if sErr != nil {
+		return nil, sErr
+	}
+
+	return &event, nil
 }
