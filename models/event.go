@@ -26,19 +26,19 @@ func (e *Event) Save() error {
     userId
   ) VALUES (?, ?, ?, ?, ?)
   `
-	stmt, qErr := db.Db.Prepare(query)
-	if qErr != nil {
-		return qErr
+	stmt, err := db.Db.Prepare(query)
+	if err != nil {
+		return err
 	}
 	defer stmt.Close()
 
-	res, exErr := stmt.Exec(e.Name, e.Description, e.Location, e.Datetime, e.UserId)
-	if exErr != nil {
-		return exErr
+	res, err := stmt.Exec(e.Name, e.Description, e.Location, e.Datetime, e.UserId)
+	if err != nil {
+		return err
 	}
-	createdId, idErr := res.LastInsertId()
-	if idErr != nil {
-		return idErr
+	createdId, err := res.LastInsertId()
+	if err != nil {
+		return err
 	}
 
 	e.Id = createdId
@@ -58,9 +58,9 @@ func GetAllEvents() ([]Event, error) {
 	var events []Event
 	for rows.Next() {
 		var event Event
-		rsErr := rows.Scan(&event.Id, &event.Name, &event.Description, &event.Location, &event.Datetime, &event.UserId)
-		if rsErr != nil {
-			return nil, rsErr
+		err := rows.Scan(&event.Id, &event.Name, &event.Description, &event.Location, &event.Datetime, &event.UserId)
+		if err != nil {
+			return nil, err
 		}
 
 		events = append(events, event)
@@ -74,9 +74,9 @@ func GetEventById(id int64) (*Event, error) {
 	qRow := db.Db.QueryRow(query, id)
 
 	var event Event
-	sErr := qRow.Scan(&event.Id, &event.Name, &event.Description, &event.Location, &event.Datetime, &event.UserId)
-	if sErr != nil {
-		return nil, sErr
+	err := qRow.Scan(&event.Id, &event.Name, &event.Description, &event.Location, &event.Datetime, &event.UserId)
+	if err != nil {
+		return nil, err
 	}
 
 	return &event, nil
@@ -115,7 +115,7 @@ func (e *Event) Delete() error {
 
 	defer stmt.Close()
 
-	_, eErr := stmt.Exec(e.Id)
+	_, err = stmt.Exec(e.Id)
 
-	return eErr
+	return err
 }
